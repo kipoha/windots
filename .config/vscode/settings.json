@@ -1,0 +1,22 @@
+{
+    "editor.fontFamily": "Cascadia Code NF",
+    "editor.fontLigatures": true,
+    "editor.fontVariations": "Cascadia Code NF",
+    "terminal.integrated.fontFamily": "Cascadia Code NF",
+    "editor.inlayHints.fontFamily": "Cascadia Code NF",
+    "editor.fontWeight": "normal",
+
+    "files.autoSave": "afterDelay",
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "workbench.iconTheme": "catppuccin-mocha",
+
+    "apc.electron": {
+        "frame": false,
+        "titleBarStyle": "hidden"
+    },
+    "window.title": " ",
+    "workbench.statusBar.visible": false,
+    "window.titleBarStyle": "native",
+    "window.customTitleBarVisibility": "never",
+    "catppuccin.accentColor": "blue"
+}

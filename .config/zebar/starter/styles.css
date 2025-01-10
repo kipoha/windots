@@ -1,0 +1,247 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
+body {
+  color: rgb(255 255 255 / 90%);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#root {
+  background: transparent;
+}
+
+/* elements */
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  height: 100%;
+  padding: 4px 7px;
+}
+
+.left,
+.center,
+.right {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-items: center;
+}
+
+.center {
+  justify-self: center;
+}
+
+.right {
+  justify-self: end;
+}
+
+.workspaces {
+  display: flex;
+  align-items: center;
+  transition: height 0.3s ease-in-out;
+}
+
+
+.workspace {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  margin: 0 2px;  
+  border: none;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  opacity: 1;
+  visibility: visible;
+  animation: fadeIn 0.3s ease-out forwards;
+  transition: all 0.3s ease-in-out, visibility 0s 0.3s;
+
+  &.displayed {
+    background: rgba(255, 255, 255);
+    border: 1px solid #8dbdff62;
+  }
+
+  &.focused,
+  &:hover {
+    background: #8dbdff62;
+  }
+}
+
+
+.binding-mode,
+.tiling-direction {
+  background: rgb(255 255 255 / 15%);
+  color: rgb(255 255 255 / 90%);
+  border-radius: 2px;
+  line-height: 1;
+  padding: 4px 8px;
+  border: 0;
+  cursor: pointer;
+}
+
+.binding-mode {
+  margin-right: 4px;
+}
+
+.cpu .high-usage {
+  color: #900029;
+}
+
+.battery {
+  position: relative;
+}
+
+.battery .charging-icon {
+  position: absolute;
+  font-size: 7px;
+  left: -8px;
+  top: 3px;
+}
+
+.date {
+  margin-left: 20px;
+}
+
+.media {
+  justify-self: end;
+  position: relative;
+  width: 300px;
+  overflow: hidden;
+  display: flex;
+}
+
+.media-title {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll 10s ease-in-out infinite alternate;
+  width: max-content;
+}
+
+.kip-blocks {
+  background: #1e1e2e;
+  border: 1px solid #8dbcff;
+  border-radius: 8px;
+  padding: 0 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; 
+  margin: 0 3px;
+  overflow: hidden;
+  position: relative;
+  animation: content-change 0.5s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+
+.center {
+  background: #1e1e2e;
+  border: 1px solid #8dbcff;
+  border-radius: 8px;
+  padding: 0 8px;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 3px;
+  overflow: hidden;
+  position: relative;
+  animation-name: none;
+  animation: content-change 0.5s ease-in-out;
+}
+
+.kip-blocks.animating-out {
+  opacity: 0;
+  animation: content-change-reverse 0.5s ease-in-out;
+}
+
+.title-animation {
+  animation: fadeOut 0.3s forwards;
+}
+
+.title-animation-enter {
+  animation: fadeIn 0.3s forwards;
+}
+
+
+/* ANIMATIONS */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+i {
+  color: rgba(161, 210, 243, 0.9);
+  margin: 0 5px 0 0;
+}
+
+
+
+
+@keyframes content-change {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes content-change-reverse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.8);
+  }
+}

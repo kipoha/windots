@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Base styles for better consistency across platforms (aka. CSS reset). -->
+    <link rel="stylesheet" type="text/css" href="../normalize.css" />
+
+    <!-- Custom styles. -->
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <!-- Add empty favicon to suppress not found errors. -->
+    <link rel="icon" href="data:;" />
+
+    <!-- Allows React to be run buildless via "text/babel" script below. -->
+    <script
+      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+      integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo="
+      crossorigin="anonymous"
+    ></script>
+    
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, {
+        useState,
+        useEffect,
+      } from 'https://esm.sh/react@18?dev';
+      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+      import * as zebar from 'https://esm.sh/zebar@2';
+
+      const providers = zebar.createProviderGroup({
+        network: { type: 'network' },
+        glazewm: { type: 'glazewm' },
+        cpu: { type: 'cpu' },
+        date: { type: 'date', formatting: 'EEE d MMM t' },
+        battery: { type: 'battery' },
+        memory: { type: 'memory' },
+        weather: { type: 'weather' },
+        keyboard: { type: 'keyboard' },
+        media: { type: 'media' },
+      });
+
+      createRoot(document.getElementById('root')).render(<App />);
+
+      function App() {
+        const [output, setOutput] = useState(providers.outputMap);
+        const [title, setTitle] = useState('');
+        const [animating, setAnimating] = useState(false);
+        const [blockAnimating, setBlockAnimating] = useState(false);
+        const [mediaText, setMediaText] = useState('');
+        const [containerWidth, setContainerWidth] = useState('auto');
+        
+
+        useEffect(() => {
+          const buttonCount = output.glazewm?.currentWorkspaces.length || 0;
+
+          const buttonWidth = 20;
+          const margin = 2;
+          const totalButtonWidth = buttonWidth + margin * 2;
+
+          const width = buttonCount * totalButtonWidth + 18;
+          setContainerWidth(`${width}px`);
+          
+        }, [output.glazewm?.currentWorkspaces]);
+
+        useEffect(() => {
+          providers.onOutput(() => setOutput(providers.outputMap));
+        }, []);
+
+        const focusedWorkspace = output?.glazewm?.focusedWorkspace;
+        const focusedWindowTitle = output?.glazewm?.focusedContainer?.title;
+        const workspaceName = focusedWorkspace && focusedWorkspace.name;
+        let newTitle = focusedWindowTitle || workspaceName;
+
+        if (/^[1-9]$/.test(newTitle)) {
+            newTitle = "Desktop";
+        }
+
+        useEffect(() => {
+          if (newTitle !== title) {
+            setAnimating(true);
+            setTimeout(() => {
+              setTitle(newTitle);
+              setAnimating(false);
+            }, 250);
+          }
+        }, [newTitle, title]);
+
+        useEffect(() => {
+          if (output.media && output.media.currentSession) {
+            setBlockAnimating(false);
+            setMediaText(`${output.media.currentSession.title} - ${output.media.currentSession.artist}`);
+          } else {
+            setBlockAnimating(true);
+          }
+        }, [output.media, output.media?.currentSession]);
+
+        // Get icon to show for current network status.
+        function getNetworkIcon(networkOutput) {
+          switch (networkOutput.defaultInterface?.type) {
+            case 'ethernet':
+              return <i className="nf nf-md-ethernet_cable"></i>;
+            case 'wifi':
+              if (networkOutput.defaultGateway?.signalStrength >= 80) {
+                return <i className="nf nf-md-wifi_strength_4"></i>;
+              } else if (
+                networkOutput.defaultGateway?.signalStrength >= 65
+              ) {
+                return <i className="nf nf-md-wifi_strength_3"></i>;
+              } else if (
+                networkOutput.defaultGateway?.signalStrength >= 40
+              ) {
+                return <i className="nf nf-md-wifi_strength_2"></i>;
+              } else if (
+                networkOutput.defaultGateway?.signalStrength >= 25
+              ) {
+                return <i className="nf nf-md-wifi_strength_1"></i>;
+              } else {
+                return <i className="nf nf-md-wifi_strength_outline"></i>;
+              }
+            default:
+              return (
+                <i className="nf nf-md-wifi_strength_off_outline"></i>
+              );
+          }
+        }
+
+        // Get icon to show for how much of the battery is charged.
+        function getBatteryIcon(batteryOutput) {
+          if (batteryOutput.chargePercent > 90)
+            return <i className="nf nf-fa-battery_4"></i>;
+          if (batteryOutput.chargePercent > 70)
+            return <i className="nf nf-fa-battery_3"></i>;
+          if (batteryOutput.chargePercent > 40)
+            return <i className="nf nf-fa-battery_2"></i>;
+          if (batteryOutput.chargePercent > 20)
+            return <i className="nf nf-fa-battery_1"></i>;
+          return <i className="nf nf-fa-battery_0"></i>;
+        }
+
+        // Get icon to show for current weather status.
+        function getWeatherIcon(weatherOutput) {
+          switch (weatherOutput.status) {
+            case 'clear_day':
+              return <i className="nf nf-weather-day_sunny"></i>;
+            case 'clear_night':
+              return <i className="nf nf-weather-night_clear"></i>;
+            case 'cloudy_day':
+              return <i className="nf nf-weather-day_cloudy"></i>;
+            case 'cloudy_night':
+              return <i className="nf nf-weather-night_alt_cloudy"></i>;
+            case 'light_rain_day':
+              return <i className="nf nf-weather-day_sprinkle"></i>;
+            case 'light_rain_night':
+              return <i className="nf nf-weather-night_alt_sprinkle"></i>;
+            case 'heavy_rain_day':
+              return <i className="nf nf-weather-day_rain"></i>;
+            case 'heavy_rain_night':
+              return <i className="nf nf-weather-night_alt_rain"></i>;
+            case 'snow_day':
+              return <i className="nf nf-weather-day_snow"></i>;
+            case 'snow_night':
+              return <i className="nf nf-weather-night_alt_snow"></i>;
+            case 'thunder_day':
+              return <i className="nf nf-weather-day_lightning"></i>;
+            case 'thunder_night':
+              return <i className="nf nf-weather-night_alt_lightning"></i>;
+          }
+        }
+
+        return (
+          <div className="app">
+            <div className="left">
+              <div className="kip-blocks" style={{ width: containerWidth }}>
+                {output.glazewm && (
+                  <div className="workspaces">
+                    {output.glazewm.currentWorkspaces.map(workspace => (
+                      <button
+                        className={`workspace ${workspace.hasFocus ? 'focused' : ''} ${workspace.isDisplayed ? 'displayed' : ''}`}
+                        onClick={() =>
+                          output.glazewm.runCommand(
+                            `focus --workspace ${workspace.name}`,
+                          )
+                        }
+                        key={workspace.name}
+                      >
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+                {output.media && output.media.currentSession ? (
+                  <div className="kip-blocks">
+                    <div className="media">
+                      <i className="nf nf-md-music_note"></i>
+                      <div className="media-title">
+                        {`${output.media.currentSession.title} - ${output.media.currentSession.artist}`}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`kip-blocks ${blockAnimating ? "animating-out" : ""}`}>
+                    <div className="media">
+                      <i className="nf nf-md-music_note"></i>
+                      <div className="media-title">
+                        {mediaText}
+                      </div>
+                    </div>  
+                  </div>
+                )}
+            </div>
+
+            <div className="center">
+                <div className={`title-animation ${animating ? 'title-animation' : 'title-animation-enter'}`}>
+                  {title}
+              </div>
+            </div>
+
+            <div className="right">
+              <div className="kip-blocks">
+                {output.keyboard && (
+                  <div className="keyboard">
+                    <i className="nf nf-md-keyboard"></i>
+                    {output.keyboard.layout}
+                  </div>
+                )}
+              </div>
+              
+              
+              <div className="kip-blocks">
+                {output.network && (
+                  <div className="network">
+                    {getNetworkIcon(output.network)}
+                    {output.network.defaultGateway?.ssid &&
+                      (output.network.defaultGateway.ssid.length > 8
+                        ? `${output.network.defaultGateway.ssid.slice(0, 8)}...`
+                        : output.network.defaultGateway.ssid)}
+                  </div>
+                )}
+              </div>
+
+              <div className="kip-blocks">
+                {output.memory && (
+                  <div className="memory">
+                    <i className="nf nf-fae-chip"></i>
+                    {Math.round(output.memory.usage)}%
+                  </div>
+                )}
+              </div>
+
+              <div className="kip-blocks">
+                {output.cpu && (
+                  <div className="cpu">
+                    <i className="nf nf-oct-cpu"></i>
+
+                    {/* Change the text color if the CPU usage is high. */}
+                    <span
+                      className={output.cpu.usage > 85 ? 'high-usage' : ''}
+                    >
+                      {Math.round(output.cpu.usage)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="kip-blocks">
+                {output.battery && (
+                  <div className="battery">
+                    {/* Show icon for whether battery is charging. */}
+                    {output.battery.isCharging && (
+                      <i className="nf nf-md-power_plug charging-icon"></i>
+                    )}
+                    {getBatteryIcon(output.battery)}
+                    {Math.round(output.battery.chargePercent)}%
+                  </div>
+                )}
+              </div>
+              <div className="kip-blocks">
+                {output.weather && (
+                  <div className="weather">
+                    {getWeatherIcon(output.weather)}
+                    {Math.round(output.weather.celsiusTemp)}°C
+                  </div>
+                )}
+
+                <div className="date">{output.date?.formatted}</div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    </script>
+  </body>
+</html>
