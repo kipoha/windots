@@ -17,6 +17,7 @@
 - Panel: [Zebar](https://github.com/glzr-io/zebar)
 - Editor Code: [Cursor](https://www.cursor.com/)
 - Browser: [Firefox](https://www.mozilla.org/en-US/firefox/)
+- App Launcher: [Flow Launcher](https://www.flowlauncher.com/)
 - Colorscheme: [Catppuccin Mocha](https://catppuccin.com/)
 
 # Setup
